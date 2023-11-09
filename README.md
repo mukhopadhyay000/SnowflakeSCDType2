@@ -15,6 +15,7 @@ I have tried to provide a generic approach using simple Snowflake stored procedu
 2.1	 Type 2 SCD Components
 
 In this process for performing SCD Type 2 for any table we need 3 sets of tables.
+
   1.	RAW Table – Load data from files in this table
   2.	STG Table – It holds the previous day data to match with current day data in the RAW table. The stream will be created in this table.
   3.	Core Table – This is the main table hold the data with Type 2 SCD.
