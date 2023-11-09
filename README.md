@@ -31,7 +31,7 @@ Snowflake Stored Procedures are used to capture the change between data and appl
 
 Snowflake Stream is an object in helping to identify the changes and mark the records as identifiable as new inserts/updates/deletes. The stream is to be created on top of the STG table and it will identify the changes with the help of SP_CHANGE_CAPTURE stored procedure.
 
-The following diagram shows the end-to-end process flow of the data movement from the RAW table  STG Table  Core Table with respect to capturing the changes and applying the changes as part of Type 2 CDC process.
+The following diagram shows the end-to-end process flow of the data movement from the RAW table/STG Table/Core Table with respect to capturing the changes and applying the changes as part of Type 2 CDC process.
 
 Note: The above codes/stored procedures will be attached with in the submission.
 
