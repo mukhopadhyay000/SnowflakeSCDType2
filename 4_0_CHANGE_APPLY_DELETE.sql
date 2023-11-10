@@ -1,11 +1,11 @@
 -- Stored Procedure on change apply delete for CDC Type2 to soft delete the recodrs deleted in the source. This SP will be used with the full file.
 -- Proc Name : SP_CHANGE_APPLY_DELETE
 -- Input Parameters
---      A. Stream Name
---		B. Target Table Name
---		C. Database Name
---		D. Schema name
---		E. Source Table Name
+--      A. Database Name
+--		B. Source Schema Name
+--		C. Target Schema Name
+--		D. Source Table Name
+--		E. Target Table Name
 -- Author : Anup Mukhopadhyay (IBM Consultant) 
 
 CREATE OR REPLACE PROCEDURE SP_CHANGE_APPLY_DELETE(DB VARCHAR, SRC_SCHMA VARCHAR, TGT_SCHMA VARCHAR, SRC_TABLE VARCHAR, TGT_TABLE VARCHAR)

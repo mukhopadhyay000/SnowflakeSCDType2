@@ -1,15 +1,15 @@
 -- Stored Procedure to insert VALUES in the CDC Config tables.
 -- Proc Name : CRT_CDC_CONFIG
 -- Input Parameters
-    --DB - Database Name
-	--SCHMA - Schema Name
+    -- DB - Database Name
+	-- SCHMA - Schema Name
 	-- TABLE_NM - Table Name
 	-- KEYS - Key Names
 	-- KEY_TYPE - Type of Key (MRG_STG_KEY/MRG_KEY)
 	-- TABLE_TYPE - Type of Table (RAW-R/TRFN-T)
 -- Author : Anup Mukhopadhyay (IBM Consultant)
 
-CREATE OR REPLACE PROCEDURE <deployment database name>.GTS_STG.CRT_CDC_CONFIG(DB VARCHAR, SCHMA VARCHAR, TABLE_NM VARCHAR, KEYS VARCHAR, KEY_TYPE VARCHAR, TABLE_TYPE VARCHAR)
+CREATE OR REPLACE PROCEDURE GTS_STG.CRT_CDC_CONFIG(DB VARCHAR, SCHMA VARCHAR, TABLE_NM VARCHAR, KEYS VARCHAR, KEY_TYPE VARCHAR, TABLE_TYPE VARCHAR)
 RETURNS STRING
 LANGUAGE JAVASCRIPT
 EXECUTE AS CALLER
