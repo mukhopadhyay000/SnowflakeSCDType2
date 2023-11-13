@@ -10,7 +10,7 @@
 --      G. Target Schema Name
 -- Author : Anup Mukhopadhyay (IBM Consultant) 
 
-CREATE OR REPLACE PROCEDURE <deployment database name>.GTS_STG.SP_CDC_MAIN(SRC_TABLE VARCHAR, STG_TABLE VARCHAR, TGT_TABLE VARCHAR, STREAM_NAME VARCHAR, DB VARCHAR, SRC_SCHMA VARCHAR, TGT_SCHMA VARCHAR, SRC_FILE_TYPE VARCHAR)
+CREATE OR REPLACE PROCEDURE GTS_STG.SP_CDC_MAIN(SRC_TABLE VARCHAR, STG_TABLE VARCHAR, TGT_TABLE VARCHAR, STREAM_NAME VARCHAR, DB VARCHAR, SRC_SCHMA VARCHAR, STG_SCHMA VARCHAR, TGT_SCHMA VARCHAR, SRC_FILE_TYPE VARCHAR)
 RETURNS STRING
 LANGUAGE JAVASCRIPT
 EXECUTE AS OWNER
@@ -21,6 +21,7 @@ $$
     var return_rows1 = [];
     var return_rows2 = [];
     var return_rows3 = [];
+	var return_rows4 = [];
 	
 	try {
 	
@@ -121,7 +122,7 @@ if (SRC_FILE_TYPE == 'F') {
 				   (src_file_name,src_file_type,schema_name,table_name,rows_parsed,rows_insert,rows_update,rows_delete,snapshot_dt,load_ts) VALUES (?,?,?,?,?,?,?,?,?,?);`
 				   ,binds : ['NA','NA',TGT_SCHMA,TGT_TABLE,0,trfn_insert,trfn_update,0,snpst_dt,load_ts]
 			});
-			audit_insert_into.execute();			
+			//audit_insert_into.execute();			
             return_rows2.push(TGT_TABLE + " -> Number of rows inserted: " + result4.getColumnValue(1) + " / " + "Number of rows updated: " + result4.getColumnValue(2));
             //fin_return_col = return_rows1 + " : " + return_rows2;
         //return (fin_return_col)
@@ -162,9 +163,46 @@ if (SRC_FILE_TYPE == 'F') {
 				   (src_file_name,src_file_type,schema_name,table_name,rows_parsed,rows_insert,rows_update,rows_delete,snapshot_dt,load_ts) VALUES (?,?,?,?,?,?,?,?,?,?);`
 				   ,binds : ['NA','NA',TGT_SCHMA,TGT_TABLE,0,trfn_insert,trfn_update,trfn_delete,snpst_dt,load_ts]
 			});
-			audit_insert_into.execute();
+			//audit_insert_into.execute();
 			return_rows3.push(TGT_TABLE + " -> Number of rows updated for source deletes: " + trfn_delete);
-			fin_return_col = return_rows1 + " : " + return_rows2 + " : "+ return_rows3;
+			fin_return_col = return_rows1 + " : " + return_rows2 + " : " + return_rows3;
+		//return (fin_return_col);
+		}
+		
+		// Exception handling part
+		catch(err){
+			return "Error in " + "step: " + v_step + ". Error messege: " + err;
+		}
+		
+	var v_step=80; // create delete statement to delete the records from STG table w/ to the soft deletes in core table due to non existance of the record in the source.
+
+		var stmt7_qry = "call " + DB + "." + SRC_SCHMA + ".SP_CHANGE_APPLY_DELETE_STG('" + DB + "','" + SRC_SCHMA + "','" + SRC_TABLE + "','" + STG_SCHMA + "','" + STG_TABLE + "','" + TGT_SCHMA + "','" + TGT_TABLE + "');";        
+		var stmt7 = snowflake.createStatement({sqlText: stmt7_qry});
+		
+		// Snowflake statement execution to create merge statement
+		try{
+			var result7 = stmt7.execute();
+			result7.next();
+			var merge_stmt4 = result7.getColumnValue(1);
+		}
+	
+		// Exception handling part
+		catch(err){
+			return "Error in " + "step: " + v_step + ". Error messege: " + err;
+		}
+		
+    var v_step=90; // execute delete statement to delete the records from STG table w/ to the soft deletes in core table due to non existance of the record in the source.
+	
+		var stmt8 = snowflake.createStatement({sqlText: merge_stmt4});
+		
+		// Snowflake statement execution part
+		try{
+			var result8 = stmt8.execute();
+			result8.next();
+			stg_delete = result8.getColumnValue(1);
+
+			return_rows4.push(STG_TABLE + " -> Number of rows deleted from stage table for source deletes: " + stg_delete);
+			fin_return_col = return_rows1 + " : " + return_rows2 + " : " + return_rows3 + " : " + return_rows4;
 		return (fin_return_col);
 		}
 		
@@ -175,7 +213,7 @@ if (SRC_FILE_TYPE == 'F') {
 }
 else {
     
-    var v_step=80; // create Type2 merge statement for core table
+    var v_step=100; // create Type2 merge statement for core table
     
     var stmt3_qry = "call " + DB + "." + SRC_SCHMA + ".SP_CHANGE_APPLY('"+ STREAM_NAME +"','"+ TGT_SCHMA +"','"+ TGT_TABLE +"','"+ DB +"','"+ SRC_SCHMA +"','"+ SRC_TABLE +"');";
     var stmt3 = snowflake.createStatement({sqlText: stmt3_qry});
@@ -192,7 +230,7 @@ else {
             return "Error in " + "step: " + v_step + ". Error messege: " + err;
         }
     
-	var v_step=90; // execute Type2 merge statement for core table
+	var v_step=110; // execute Type2 merge statement for core table
     
     var stmt4 = snowflake.createStatement({sqlText: merge_stmt2});
 		
