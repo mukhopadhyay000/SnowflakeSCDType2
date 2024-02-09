@@ -36,7 +36,7 @@ The following diagram shows the end-to-end process flow of the data movement fro
 
 Note: The above codes/stored procedures will be attached with in the submission.
 
-<img width="452" alt="image" src="https://github.com/mukhopadhyay000/SnowflakeSCDType2/assets/31094004/f763e59d-13d6-4907-9d5d-c14a4bfdbd69">
+![DataLoadingProcess-PX CDC Process drawio](https://github.com/mukhopadhyay000/SnowflakeSCDType2/assets/31094004/a17a4478-2ce1-4245-9687-12037890c6c1)
 
 3.0	Type 2 SCD Process
 
@@ -62,9 +62,8 @@ CALL CRT_CDC_CONFIG ('<Database_Name>', '<Schema_Name>', '<RAW_Table_Name>', '<K
   2.	Key_Name – if more than one key then provide the keys separated with semi-colon (key1;key2).
   3.	Table_Type Value – ‘T’ in case of RAW table.
 
-
 6.	Load the data in the RAW table with copy command or any customized stored procedure. In case of csv/delimited files directly files can be loaded in the RAW tables. In case of JSON/XML first the file needs to be flattened and then load into the RAW tables.
-7.	Run the following CDC Command to execute the wrapper script ()SP_CDC_MAIN) with parameters as mentioned with in the command line. The wrapper CDC Script (SP_CDC_MAIN) will sequentially execute SP_CHANGE_CAPTURE, SP_CHANGE_APPLY and SP_CHANGE_APPLY_DELETE.
+7.	Run the following CDC Command to execute the wrapper script ()SP_CDC_MAIN) with parameters as mentioned with in the command line. The wrapper CDC Script (SP_CDC_MAIN) will sequentially execute SP_CHANGE_CAPTURE, SP_CHANGE_APPLY, SP_CHANGE_APPLY_DELETE and SP_CHANGE_APPLY_DELETE_STG.
 
 When source file processing is delta the SP_CDC_MAIN will execute SP_CHANGE_CAPTURE and SP_CHANGE_APPLY. The execution command is as follows:
 
