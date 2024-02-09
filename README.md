@@ -26,8 +26,9 @@ Snowflake Stored Procedures are used to capture the change between data and appl
 1.	SP_CDC_MAIN – Parameterized stored procedure is a wrapper script on top of SP_CHANGE_CAPTURE and SP_CHANGE_APPLY for execution of the merge statements created by these 2 stored procedures.
 2.	SP_CHANGE_CAPTURE - Parameterized stored procedure is capturing the changes between previous day data and current day data and create the merge statement to update the data in the STG table.
 3.	SP_CHANGE_APPLY - Parameterized stored procedure is applying the changes in the Core table through STG table and the Stream.
-4.	SP_CHANGE_APPLY_DELETE – Parameterized stored procedure applying soft deletes in case of full file processing in case record not in source but in target.
-5.	CRT_CDC_CONFIG – Parameterized stored procedure to create CDC config table entries.
+4.	SP_CHANGE_APPLY_DELETE – Parameterized stored procedure applying soft deletes in transform table for full file processing in case record not in source but in target i.e. records deleted from source.
+5.	SP_CHANGE_APPLY_DELETE_STG – Parameterized stored procedure to delete the stage records due to the soft deletes in transform table for full file processing in case record not in source but in target i.e. records deleted from source.
+6.	CRT_CDC_CONFIG – Parameterized stored procedure to create CDC config table entries.
 
 Snowflake Stream is an object in helping to identify the changes and mark the records as identifiable as new inserts/updates/deletes. The stream is to be created on top of the STG table and it will identify the changes with the help of SP_CHANGE_CAPTURE stored procedure.
 
