@@ -1,11 +1,11 @@
 -- Stored Procedure on change apply delete for CDC Type2 to soft delete the recodrs deleted in the source. This SP will be used with the full file.
 -- Proc Name : SP_CHANGE_APPLY_DELETE
 -- Input Parameters
---      A. Database Name
---		B. Source Schema Name
---		C. Target Schema Name
---		D. Source Table Name
---		E. Target Table Name
+--      A. Stream Name
+--		B. Target Table Name
+--		C. Database Name
+--		D. Schema name
+--		E. Source Table Name
 -- Author : Anup Mukhopadhyay (IBM Consultant) 
 
 CREATE OR REPLACE PROCEDURE SP_CHANGE_APPLY_DELETE(DB VARCHAR, SRC_SCHMA VARCHAR, TGT_SCHMA VARCHAR, SRC_TABLE VARCHAR, TGT_TABLE VARCHAR)
@@ -27,14 +27,18 @@ $$
     var fin_update_cond = [];
 
 	try {
-
-			//var sel_sql1 = "select COL_NM FROM "+ DB + "." + SRC_SCHMA + ".C_ING_PX_CDC_CONFIG WHERE TBL_NM = '"+ SRC_SCHMA + "'." + SRC_TABLE +"' and TYP = 'MRG_STG_KY' ORDER BY ORDINAL_POSITION;";
-			var sel_sql1 = `select COL_NM FROM ${DB}.${SRC_SCHMA}.C_ING_PX_CDC_CONFIG WHERE TBL_NM = '${SRC_TABLE}' and TYP = 'MRG_STG_KY' ORDER BY ORDINAL_POSITION;`			
-
-			var sel_stmt1 = snowflake.createStatement({sqlText: sel_sql1});
 			
+			var sel_sql1 = `select COL_NM FROM ${DB}.${SRC_SCHMA}.C_ING_PX_CDC_CONFIG WHERE TBL_NM = '${SRC_TABLE}' and TYP = 'MRG_STG_KY' ORDER BY ORDINAL_POSITION;`			
+			var sel_stmt1 = snowflake.createStatement({sqlText: sel_sql1});
 			var sel_res1 = sel_stmt1.execute();
 			
+			var sel_sql2 = `select distinct to_char(dateadd(day, -1, SNPST_DT), 'YYYY-MM-DD') from ${DB}.${SRC_SCHMA}.${SRC_TABLE};`
+			var sel_stmt2 = snowflake.createStatement({sqlText: sel_sql2});
+			var sel_res2 = sel_stmt2.execute();
+
+			while (sel_res2.next()) {
+				var v_snpst_dt = sel_res2.getColumnValue(1);
+			}
 			while (sel_res1.next()) {
 				ky_col.push(sel_res1.getColumnValue(1));
 			}
@@ -67,8 +71,8 @@ $$
 			mrg_sql += "ON " + out_join_key
 			mrg_sql += " AND X.EFFCTV_TO_TMS = '9999-12-31' AND X.CRNT_FLG = 'Y' "
 			mrg_sql += " WHEN MATCHED THEN UPDATE SET "
-			mrg_sql += "EFFCTV_TO_TMS = TO_TIMESTAMP_NTZ(dateadd(day,+0,TO_DATE(X.SNPST_DT)))"
-			mrg_sql += ",X.CRNT_FLG = 'N';"
+            mrg_sql += "EFFCTV_TO_TMS = '" + v_snpst_dt + "'"
+			mrg_sql += ", X.CRNT_FLG = 'N';"
 				
 			return mrg_sql;
 	}

@@ -46,9 +46,9 @@ $$
 			del_sql += "WHERE "
 			del_sql += "(" + ky1 + ") in (SELECT "
 			del_sql += ky_col + " FROM ("
-			del_sql += "SELECT " + ky_col + " FROM " + STG_SCHMA + "." + STG_TABLE
+			del_sql += "SELECT DISTINCT " + ky_col + " FROM " + STG_SCHMA + "." + STG_TABLE
 			del_sql += " minus "
-			del_sql += "SELECT " + ky_col + " FROM " + TGT_SCHMA + "." + TGT_TABLE
+			del_sql += "SELECT DISTINCT " + ky_col + " FROM " + TGT_SCHMA + "." + TGT_TABLE
 			del_sql += " WHERE CRNT_FLG = 'Y'));" 
 
 				
@@ -58,5 +58,3 @@ $$
 		return "Error :" + err;
 	}
 $$;
-
--- call SP_CHANGE_APPLY_DELETE_STG('PXCF_GTS_DEV_DB, 'GTS_STG', SRC_TABLE VARCHAR, 'GTS_STG', 'ING_PX_POS_RAW, 'GTS_TRFN', 'TRFN_PX_POS')
